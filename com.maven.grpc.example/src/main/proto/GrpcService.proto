@@ -1,0 +1,25 @@
+syntax = "proto3";
+package com.maven.grpc.example;
+
+
+message ClientRequest {
+    int64 id = 1;
+   string employeeName=2;
+}
+
+message ClientResponse{
+string employee=1;
+}
+message ClientResponseList{
+string employeeList=1;
+}
+message Sucess{
+string status=1;
+
+}
+service CommunicateService {
+    rpc fetchEmployee(ClientRequest) returns (ClientResponse);
+    rpc updateEmployeeWithId(ClientRequest) returns (Sucess);
+    rpc deleteEmployeeWithId(ClientRequest) returns (Sucess);
+
+}
