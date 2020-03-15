@@ -7,7 +7,7 @@ import io.grpc.*;
 public class ClientRequestIntilizer {
 //creating a request for fetching details of Employee with id 1
     public static void main(String[] args) {
-        GrpcService.ClientRequest clientRequest = GrpcService.ClientRequest.newBuilder().setId(1).build();
+        GrpcService.ClientRequest clientRequest = GrpcService.ClientRequest.newBuilder().setEmployeeName("Shivankur").build();
         ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 8080)
                 .usePlaintext()
                 .build();

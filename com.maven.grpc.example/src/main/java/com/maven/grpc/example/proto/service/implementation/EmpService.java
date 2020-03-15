@@ -1,7 +1,9 @@
-package com.maven.grpc.example;
+package com.maven.grpc.example.proto.service.implementation;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.maven.grpc.example.CommunicateServiceGrpc;
+import com.maven.grpc.example.GrpcService;
 import com.maven.grpc.example.server.entity.Employee;
 import com.maven.grpc.example.server.entity.HibernateUtils;
 import io.grpc.stub.StreamObserver;
@@ -11,6 +13,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
 import javax.persistence.Query;
+import java.util.List;
 
 public class EmpService extends CommunicateServiceGrpc.CommunicateServiceImplBase {
     private Gson gson= new Gson();
@@ -22,21 +25,23 @@ public class EmpService extends CommunicateServiceGrpc.CommunicateServiceImplBas
         Transaction tx = session.beginTransaction();
        Query query = session.getNamedQuery("select_with_id").setParameter("id",id);
         Employee employee = (Employee) query.getSingleResult();
+        session.close();
         return employee ;
     }
     //fetching the data with requried name from db
-    private static Employee fetchEmployeeDataByName(final String name) {
+    private static List<Employee> fetchEmployeeDataByName(final String name) {
     SessionFactory sessionFactory = HibernateUtils.getSessionFactory();
         Session session = sessionFactory.getCurrentSession();
         Transaction tx = session.beginTransaction();
         Query query = session.getNamedQuery("select_with_name").setParameter("employeeName",name);
-        Employee employee = (Employee) query.getSingleResult();
-        return employee ;
+        List<Employee> employeeList = query.getResultList();
+        session.close();
+        return employeeList ;
     }
 //Accessing the request from server and returning it to the clint in String Format
     @Override
     public void fetchEmployee(GrpcService.ClientRequest request, StreamObserver<GrpcService.ClientResponse> responseObserver) {
-        final Object ob = request.getEmployeeName() != null|request.getEmployeeName()!=""? request.getEmployeeName() : new Long(request.getId());
+        final Object ob = request.getEmployeeName().isEmpty()||request.getEmployeeName()==null? request.getId() : request.getEmployeeName();
         if (ob.getClass().getName().equals("java.lang.String")) {
             clientResponse  = GrpcService.ClientResponse.newBuilder().setEmployee( gson.toJson(fetchEmployeeDataByName(request.getEmployeeName()))).build();
             responseObserver.onNext(clientResponse);
