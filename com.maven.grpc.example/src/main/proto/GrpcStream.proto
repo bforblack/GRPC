@@ -1,0 +1,17 @@
+syntax = "proto3";
+package com.maven.grpc.example;
+
+
+message StreamDataRequest{
+    string query=1;
+}
+
+message ClientStreamResponse{
+    string streamDataResponse=1;
+}
+
+service CommunicateStreamService {
+    rpc CommunicateRequestStringReturnStreamService(StreamDataRequest)returns(stream ClientStreamResponse);
+    rpc CommunicateStreamServiceDynamic(stream StreamDataRequest)returns(stream ClientStreamResponse);
+    rpc CommunicateRequestStreamReturnStringService(stream StreamDataRequest)returns( ClientStreamResponse);
+}
